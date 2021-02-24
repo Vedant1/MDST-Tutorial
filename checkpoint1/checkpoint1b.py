@@ -17,21 +17,40 @@ Once you are finished with this program, you should run `python preprocess.py` f
 This should load the data, perform preprocessing, and save the output to the data folder.
 
 """
+import pandas as pd
 
 def remove_percents(df, col):
+    df[col]=df[col].str.replace("%","")
+    df[col] = pd.to_numeric(df[col])
     return df
 
 def fill_zero_iron(df):
+    df['Iron (% DV)'] = df['Iron (% DV)'].fillna(0)
     return df
     
 def fix_caffeine(df):
+    df['Caffeine (mg)']=df['Caffeine (mg)'].str.replace("Varies","0")
+    df['Caffeine (mg)']=df['Caffeine (mg)'].str.replace("varies","0")
+    df['Caffeine (mg)']=df['Caffeine (mg)'].fillna("0")
     return df
 
 def standardize_names(df):
+    df.columns = ['beverage_category','beverage','beverage_prep','calories','total fat','trans fat','saturated fat','sodium', 'total carbohydrates','cholesterol','dietary fibre','sugars','protein','vitamin a','vitamin c','calcium','iron','caffeine']
     return df
 
 def fix_strings(df, col):
+    #df[col] = df[col].map(lambda x: str(x).lstrip('*').rstrip('*'))
+    df[col]=df[col].apply(strip_string)
+    df[col]=df[col].str.lower()
     return df
+
+def strip_string(s):
+    alpha = ""
+    for val in s:
+        if val.isalnum() or val==" ":
+            alpha+=val
+            
+    return alpha
 
 
 def main():
@@ -66,6 +85,7 @@ def main():
     
     # now that the data is all clean, save your output to the `data` folder as 'starbucks_clean.csv'
     # you will use this file in checkpoint 2
+    df.to_csv(r'/Users/Vedant/Documents/UMICH/MDST/mdst_tutorials/data/starbucks_clean.csv')
     
     
 
